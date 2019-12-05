@@ -52,9 +52,7 @@ def getXYs(args):
         if args.camera_zenith <= 0 or args.camera_zenith >= 90:
             continue
         xi = args.focus_length * math.tan((azimuth_list[i] - args.camera_azimuth)/180.0*math.pi)
-        yi = args.focus_length * math.tan((zenith_list[i] - args.camera_zenith)/180.0*math.pi)
-        if args.camera_azimuth > 90 and args.camera_azimuth < 270:
-            yi = -yi
+        yi = args.focus_length * math.tan((args.camera_zenith - zenith_list[i])/180.0*math.pi)
         if xi < -args.sensor_width/2 or xi > args.sensor_width/2 or yi < -args.sensor_height/2 or yi > args.sensor_height/2:
             continue
         if i == args.npoints_before - 1:
