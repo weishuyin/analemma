@@ -6,6 +6,9 @@ This python code can show you how to take photos of analemma. How to place your 
 
 In this code, the latitude and longitude are positive for North and East, respectively. The azimuth angle is 0 at North and positive towards the east. The zenith angle is 0 at vertical and positive towards the horizon[2]. 
 
+Camera's azimuth, pitch, roll are like android's, but the range of roll values is -π to π.
+https://developer.android.com/reference/android/hardware/SensorManager.html#getOrientation(float[],%20float[])
+
 The datetime must be in UTC.
 
 The green point means where is Sun at the datetime you inputted. Sun runs from the red point to the blue point.
@@ -27,7 +30,7 @@ python analemma.py
 
 ## Example2
 ```
-python analemma.py --datetime '2019-12-4 7:0:0' --latitude 30.0 --longitude 120.0 --focus_length=16 --camera_azimuth 250 --camera_zenith 70
+python analemma.py --datetime '2019-12-4 7:0:0' --latitude 30.0 --longitude 120.0 --focus_length=16 --camera_azimuth 250 --camera_pitch -30
 ```
 ![alt example12](https://raw.githubusercontent.com/weishuyin/analemma/master/img/example2.png "example2")
 
