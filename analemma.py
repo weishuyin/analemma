@@ -71,8 +71,8 @@ def viewAzimuthZenith2Projection(azimuth, zenith, args):
         return None
     if args.facing_back == False and (azimuth <= 90 or azimuth >= 270):
         return None
-    x = args.focus_length*math.tan(azimuth/180.0*math.pi)
-    y = args.focus_length*math.tan((90-zenith)/180.0*math.pi)
+    x = args.focal_length*math.tan(azimuth/180.0*math.pi)
+    y = args.focal_length*math.tan((90-zenith)/180.0*math.pi)
     if x > args.sensor_width/2 or x < -args.sensor_width/2:
         return None
     if y > args.sensor_height/2 or y < -args.sensor_height/2:
@@ -107,7 +107,7 @@ def getPoints(args):
 
 def plot(args, xs, ys, colors):
     fig, ax = plt.subplots()
-    sun_diameter_in_mm = 1.392/149.6*args.focus_length
+    sun_diameter_in_mm = 1.392/149.6*args.focal_length
     sun_diameter_in_dots = sun_diameter_in_mm/args.sensor_width*fig.get_size_inches()[0]*fig.get_dpi()
 
     ax.scatter(xs, ys, sun_diameter_in_dots*sun_diameter_in_dots, colors)
@@ -128,7 +128,7 @@ def main():
     parser.add_argument("--camera_pitch", default=-1000, help="pitch", type=float)
     parser.add_argument("--camera_roll", default=0, help="roll", type=float)
     parser.add_argument("--facing_back", default=True, help="camera facing back or not", type=bool)
-    parser.add_argument("--focus_length", default=24, help="camera focus length in mm", type=float)
+    parser.add_argument("--focal_length", default=24, help="camera focal length in mm", type=float)
     parser.add_argument("--sensor_width", default=36, help="camera sensor width in mm", type=float)
     parser.add_argument("--sensor_height", default=24, help="camera sensor height in mm", type=float)
 

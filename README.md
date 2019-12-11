@@ -30,7 +30,7 @@ python analemma.py
 
 ## Example2
 ```
-python analemma.py --datetime '2019-12-4 7:0:0' --latitude 30.0 --longitude 120.0 --focus_length=16 --camera_azimuth 250 --camera_pitch -30
+python analemma.py --datetime '2019-12-4 7:0:0' --latitude 30.0 --longitude 120.0 --focal_length=16 --camera_azimuth 250 --camera_pitch -30
 ```
 ![alt example12](https://raw.githubusercontent.com/weishuyin/analemma/master/img/example2.png "example2")
 
