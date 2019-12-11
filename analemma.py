@@ -42,10 +42,10 @@ def getSolarPositions(args):
 
 # Coordinate System Transforms
 def worldAzimuthZenith2WorldPoint(azimuth, zenith):
-    sunDistance = 1.496*math.pow(10, 14) # in mm
-    xWorld = sunDistance*math.sin(zenith/180.0*math.pi)*math.sin(azimuth/180.0*math.pi)
-    yWorld = sunDistance*math.sin(zenith/180.0*math.pi)*math.cos(azimuth/180.0*math.pi)
-    zWorld = sunDistance*math.cos(zenith/180.0*math.pi)
+    sunDistanceInMM = 1.496*math.pow(10, 14) # in mm
+    xWorld = sunDistanceInMM*math.sin(zenith/180.0*math.pi)*math.sin(azimuth/180.0*math.pi)
+    yWorld = sunDistanceInMM*math.sin(zenith/180.0*math.pi)*math.cos(azimuth/180.0*math.pi)
+    zWorld = sunDistanceInMM*math.cos(zenith/180.0*math.pi)
     return np.array([[xWorld],[yWorld],[zWorld]])
 
 def worldPoint2ViewPoint(point, azimuth, pitch, roll):
@@ -69,7 +69,7 @@ def viewPoint2ViewAzimuthZenith(point):
 def viewAzimuthZenith2Projection(azimuth, zenith, args):
     if args.facing_back == True and (azimuth >= 90 and azimuth <= 270):
         return None
-    if args.facing_back == False and (azimuth <= 90 and azimuth >= -90):
+    if args.facing_back == False and (azimuth <= 90 or azimuth >= 270):
         return None
     x = args.focus_length*math.tan(azimuth/180.0*math.pi)
     y = args.focus_length*math.tan((90-zenith)/180.0*math.pi)
@@ -149,9 +149,11 @@ def main():
         default_zenith = sum(zenith_list)/len(zenith_list)
         if args.camera_azimuth == -1000:
             args.camera_azimuth = default_azimuth
+            if args.camera_azimuth > 180.0:
+                args.camera_azimuth -= 360.0
             print "default camera_azimuth is %f" % args.camera_azimuth
         if args.camera_pitch == -1000:
-            args.camera_pitch = default_zenith - 90
+            args.camera_pitch = default_zenith - 90.0
             print "default camera_pitch is %f" % args.camera_pitch
     xs, ys, colors = getPoints(args)
     plot(args, xs, ys, colors)
