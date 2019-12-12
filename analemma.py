@@ -130,7 +130,7 @@ def main():
     parser.add_argument("--camera_azimuth", default=-1000, help="azimuth", type=float)
     parser.add_argument("--camera_pitch", default=-1000, help="pitch", type=float)
     parser.add_argument("--camera_roll", default=0, help="roll", type=float)
-    parser.add_argument("--facing_back", default=True, help="camera facing back or not", type=bool)
+    parser.add_argument("--facing_back", default=True, help="camera facing back or not", type=lambda s: s == "True")
     parser.add_argument("--focal_length", default=24, help="camera focal length in mm", type=float)
     parser.add_argument("--sensor_width", default=36, help="camera sensor width in mm", type=float)
     parser.add_argument("--sensor_height", default=24, help="camera sensor height in mm", type=float)
