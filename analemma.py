@@ -4,6 +4,7 @@ import pytz
 import urllib2
 import json
 import argparse
+import sys
 import math
 import numpy as np
 import matplotlib.pyplot as plt
@@ -41,43 +42,44 @@ def getSolarPositions(args):
     return azimuth_list,zenith_list
 
 # Coordinate System Transforms
-def worldAzimuthZenith2WorldPoint(azimuth, zenith):
+def worldAzimuthZenith2WorldPoint(sunAzimuth, sunZenith):
+    if sunAzimuth < 0 or sunAzimuth > 360 or sunZenith < 0 or sunZenith > 180:
+        print "worldAzimuthZenith2WorldPoint wrong argument %s %s" % (sunAzimuth, sunZenith)
+        sys.exit(-1)
     sunDistanceInMM = 1.496*math.pow(10, 14) # in mm
-    xWorld = sunDistanceInMM*math.sin(zenith/180.0*math.pi)*math.sin(azimuth/180.0*math.pi)
-    yWorld = sunDistanceInMM*math.sin(zenith/180.0*math.pi)*math.cos(azimuth/180.0*math.pi)
-    zWorld = sunDistanceInMM*math.cos(zenith/180.0*math.pi)
-    return np.array([[xWorld],[yWorld],[zWorld]])
+    xWorld = sunDistanceInMM*math.sin(sunZenith/180.0*math.pi)*math.sin(sunAzimuth/180.0*math.pi)
+    yWorld = sunDistanceInMM*math.sin(sunZenith/180.0*math.pi)*math.cos(sunAzimuth/180.0*math.pi)
+    zWorld = sunDistanceInMM*math.cos(sunZenith/180.0*math.pi)
+    worldPoint = np.array([[xWorld],[yWorld],[zWorld]])
+    return worldPoint
 
-def worldPoint2ViewPoint(point, azimuth, pitch, roll):
-    Rx = np.array([[1,0,0], [0, math.cos(pitch/180.0*math.pi), -math.sin(pitch/180.0*math.pi)], [0, math.sin(pitch/180.0*math.pi), math.cos(pitch/180.0*math.pi)]])
-    Ry = np.array([[math.cos(roll/180.0*math.pi),0,math.sin(roll/180.0*math.pi)], [0,1,0], [-math.sin(roll/180.0*math.pi),0,math.cos(roll/180.0*math.pi)]])
-    Rz = np.array([[math.cos(azimuth/180.0*math.pi), -math.sin(azimuth/180.0*math.pi), 0], [math.sin(azimuth/180.0*math.pi), math.cos(azimuth/180.0*math.pi), 0], [0,0,1]])
+def worldPoint2ViewPoint(worldPoint, cameraAzimuth, cameraPitch, cameraRoll):
+    Rx = np.array([[1,0,0], [0, math.cos(cameraPitch/180.0*math.pi), -math.sin(cameraPitch/180.0*math.pi)], [0, math.sin(cameraPitch/180.0*math.pi), math.cos(cameraPitch/180.0*math.pi)]])
+    Ry = np.array([[math.cos(cameraRoll/180.0*math.pi),0,math.sin(cameraRoll/180.0*math.pi)], [0,1,0], [-math.sin(cameraRoll/180.0*math.pi),0,math.cos(cameraRoll/180.0*math.pi)]])
+    Rz = np.array([[math.cos(cameraAzimuth/180.0*math.pi), -math.sin(cameraAzimuth/180.0*math.pi), 0], [math.sin(cameraAzimuth/180.0*math.pi), math.cos(cameraAzimuth/180.0*math.pi), 0], [0,0,1]])
     matrix = np.dot(Rx, np.dot(Ry, Rz))
-    return np.dot(matrix, point)
+    viewPoint = np.dot(matrix, worldPoint)
+    return viewPoint
 
-def viewPoint2ViewAzimuthZenith(point):
-    x = point[0,0]
-    y = point[1,0]
-    z = point[2,0]
-    distance = math.sqrt(x*x + y*y + z*z)
-    zenith = math.acos(z/distance)/math.pi*180.0
-    azimuth = math.atan2(x, y)/math.pi*180.0
-    if azimuth < 0:
-        azimuth += 360
-    return azimuth, zenith
-
-def viewAzimuthZenith2Projection(azimuth, zenith, args):
-    if args.facing_back == True and (azimuth >= 90 and azimuth <= 270):
+def viewAzimuthZenith2Projection(viewPoint, args):
+    x = viewPoint[0,0]
+    y = viewPoint[1,0]
+    z = viewPoint[2,0]
+    if args.facing_back == True:
+        if z >= 0.0:
+            return None
+        xInMM = args.focal_length*x/(-z)
+        yInMM = args.focal_length*y/(-z)
+    else:
+        if z <= 0.0:
+            return None
+        xInMM = args.focal_length*x/z
+        yInMM = args.focal_length*y/z
+    if xInMM > args.sensor_width/2 or xInMM < -args.sensor_width/2:
         return None
-    if args.facing_back == False and (azimuth <= 90 or azimuth >= 270):
+    if yInMM > args.sensor_height/2 or yInMM < -args.sensor_height/2:
         return None
-    x = args.focal_length*math.tan(azimuth/180.0*math.pi)
-    y = args.focal_length*math.tan((90-zenith)/180.0*math.pi)
-    if x > args.sensor_width/2 or x < -args.sensor_width/2:
-        return None
-    if y > args.sensor_height/2 or y < -args.sensor_height/2:
-        return None
-    return x,y
+    return xInMM,yInMM
 
 # end of Coordinate System Transforms
 
@@ -89,8 +91,8 @@ def getPoints(args):
     for i in range(len(azimuth_list)):
         worldPoint = worldAzimuthZenith2WorldPoint(azimuth_list[i], zenith_list[i])
         viewPoint = worldPoint2ViewPoint(worldPoint, args.camera_azimuth, args.camera_pitch, args.camera_roll)
-        viewAzimuth, viewZenith = viewPoint2ViewAzimuthZenith(viewPoint)
-        ret = viewAzimuthZenith2Projection(viewAzimuth, viewZenith, args)
+        # viewAzimuth, viewZenith = viewPoint2ViewAzimuthZenith(viewPoint)
+        ret = viewAzimuthZenith2Projection(viewPoint, args)
         if not ret:
             continue;
         if i == args.npoints_before - 1:
@@ -144,16 +146,21 @@ def main():
 
     args = parser.parse_args()
     if args.camera_azimuth == -1000 or args.camera_pitch == -1000:
-        azimuth_list,zenith_list = getSolarPositions(args)
-        default_azimuth = sum(azimuth_list)/len(azimuth_list)
-        default_zenith = sum(zenith_list)/len(zenith_list)
+        marchDateTime = args.datetime - timedelta(days = (args.datetime.month - 3)*30)
+        default_azimuth, default_zenith = sunpos(marchDateTime, latitude=args.latitude, longitude=args.longitude, elevation=args.elevation)[:2]
         if args.camera_azimuth == -1000:
-            args.camera_azimuth = default_azimuth
-            if args.camera_azimuth > 180.0:
-                args.camera_azimuth -= 360.0
+            if args.facing_back == True:
+                args.camera_azimuth = default_azimuth
+                if args.camera_azimuth > 180.0:
+                    args.camera_azimuth -= 360.0
+            else:
+                args.camera_azimuth = default_azimuth - 180.0
             print "default camera_azimuth is %f" % args.camera_azimuth
         if args.camera_pitch == -1000:
-            args.camera_pitch = default_zenith - 90.0
+            if args.facing_back == True:
+                args.camera_pitch = default_zenith - 180.0
+            else:
+                args.camera_pitch = -default_zenith
             print "default camera_pitch is %f" % args.camera_pitch
     xs, ys, colors = getPoints(args)
     plot(args, xs, ys, colors)
