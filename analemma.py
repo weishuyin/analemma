@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 from sunposition import sunpos
 from datetime import datetime,timedelta
 import pytz
@@ -61,23 +63,23 @@ def worldPoint2ViewPoint(worldPoint, cameraAzimuth, cameraPitch, cameraRoll):
     viewPoint = np.dot(matrix, worldPoint)
     return viewPoint
 
-def viewAzimuthZenith2Projection(viewPoint, args):
+def viewPoint2Projection(viewPoint, focal_length, sensor_width, sensor_height, facing_back):
     x = viewPoint[0,0]
     y = viewPoint[1,0]
     z = viewPoint[2,0]
-    if args.facing_back == True:
+    if facing_back == True:
         if z >= 0.0:
             return None
-        xInMM = args.focal_length*x/(-z)
-        yInMM = args.focal_length*y/(-z)
+        xInMM = focal_length*x/(-z)
+        yInMM = focal_length*y/(-z)
     else:
         if z <= 0.0:
             return None
-        xInMM = args.focal_length*x/z
-        yInMM = args.focal_length*y/z
-    if xInMM > args.sensor_width/2 or xInMM < -args.sensor_width/2:
+        xInMM = focal_length*x/z
+        yInMM = focal_length*y/z
+    if xInMM > sensor_width/2 or xInMM < -sensor_width/2:
         return None
-    if yInMM > args.sensor_height/2 or yInMM < -args.sensor_height/2:
+    if yInMM > sensor_height/2 or yInMM < -sensor_height/2:
         return None
     return xInMM,yInMM
 
@@ -91,8 +93,7 @@ def getPoints(args):
     for i in range(len(azimuth_list)):
         worldPoint = worldAzimuthZenith2WorldPoint(azimuth_list[i], zenith_list[i])
         viewPoint = worldPoint2ViewPoint(worldPoint, args.camera_azimuth, args.camera_pitch, args.camera_roll)
-        # viewAzimuth, viewZenith = viewPoint2ViewAzimuthZenith(viewPoint)
-        ret = viewAzimuthZenith2Projection(viewPoint, args)
+        ret = viewPoint2Projection(viewPoint, args.focal_length, args.sensor_width, args.sensor_height, args.facing_back)
         if not ret:
             continue;
         if i == args.npoints_before - 1:
