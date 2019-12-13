@@ -6,9 +6,9 @@ In astronomy, an analemma is a diagram showing the position of the Sun in the sk
 
 This python code can show you how to take photos of analemma. How to place your DSLR, where and when to take shot.
 
-The green point means where is Sun at the datetime you inputted. Sun runs from the red point to the blue point.
+The green point means the location of the Sun based on the date&time you input. Sun runs from the red point to the blue point.
 
-In this code, datetime is UTC time. Latitude is positive for North, longitude is positive for East. Camera's orientation is same as android's orientation defined in /hardware/libhardware/include/hardware/sensors.h:
+In this code, date&time is in UTC format. Latitude is positive for the Northern Hemisphere, longitude is positive for the Eastern Hemisphere. Camera's orientation is same as android's orientation defined in /hardware/libhardware/include/hardware/sensors.h:
 ```
 /**
  * Definition of the axis
@@ -58,8 +58,8 @@ In this code, datetime is UTC time. Latitude is positive for North, longitude is
  * roll: Rotation around Y axis (-90<=roll<=90), with positive values when
  *  the x-axis moves towards the z-axis.
 ```
-
-By the way, you can put your phone and camera together to get camera's orientation.
+You can put your phone and camera together, camera screen's width align to phone's width, camera screen's height align to phone's height, so you can get camera's orientation. 
+In some app, orientation may be -180.0<=azimuth<=180.0, -90<=pitch<=90, -180<=roll<=180, it's ok.
 
 Sun position calculation is based on [s-bear/sun-position](https://github.com/s-bear/sun-position).
 
