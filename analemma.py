@@ -16,14 +16,17 @@ def getIPAddress():
     content = response.read()
     jsonContent = json.loads(content)
     IP = jsonContent["origin"].split(",")[0]
+    print "ip=%s" % IP
     return IP
 
 def getLatitudeLongitude():
+    print "auto detecting latitude&longitude, may be very slow"
     IP = getIPAddress()
     response = urllib2.urlopen("http://ipinfo.io/" + IP)
     content = response.read()
     jsonContent = json.loads(content)
     latitude,longitude = jsonContent["loc"].split(",")
+    print "latitude=%f longitude=%f" % (latitude, longitude)
     return latitude,longitude
 
 def getDateTimes(date, npoints_before, npoints_after):
@@ -124,12 +127,11 @@ def plot(args, xs, ys, colors):
         plt.show()
 
 def main():
-    default_latitude, default_longitude = getLatitudeLongitude()
     parser = argparse.ArgumentParser()
     parser.description = "draw analemma, the Sun runs from red point to green point to blue point"
     parser.add_argument("--camera_azimuth", default=-1000, help="azimuth", type=float)
     parser.add_argument("--camera_pitch", default=-1000, help="pitch", type=float)
-    parser.add_argument("--camera_roll", default=0, help="roll", type=float)
+    parser.add_argument("--camera_roll", default=-1000, help="roll", type=float)
     parser.add_argument("--facing_back", default=True, help="camera facing back or not", type=lambda s: s == "True")
     parser.add_argument("--focal_length", default=24, help="camera focal length in mm", type=float)
     parser.add_argument("--sensor_width", default=36, help="camera sensor width in mm", type=float)
@@ -139,30 +141,31 @@ def main():
     parser.add_argument("--npoints_before", default=15, help="number of points before datetime", type=int)
     parser.add_argument("--npoints_after", default=15, help="number of points after datetime", type=int)
 
-    parser.add_argument("--latitude", default=default_latitude, help="latitude", type=float)
-    parser.add_argument("--longitude", default=default_longitude, help="longitude", type=float)
+    parser.add_argument("--latitude", help="latitude", type=float)
+    parser.add_argument("--longitude", help="longitude", type=float)
     parser.add_argument("--elevation", default=0, help="elevation", type=float)
 
     parser.add_argument("--save", metavar="FILENAME", nargs="?", const="analemma.png", help="save image", type=str)
 
     args = parser.parse_args()
-    if args.camera_azimuth == -1000 or args.camera_pitch == -1000:
+    if args.latitude == None or args.longitude == None:
+        args.latitude, args.longitude = getLatitudeLongitude()
+    if args.camera_azimuth == -1000 or args.camera_pitch == -1000 or args.camera_roll == -1000:
         marchDateTime = args.datetime - timedelta(days = (args.datetime.month - 3)*30)
         default_azimuth, default_zenith = sunpos(marchDateTime, latitude=args.latitude, longitude=args.longitude, elevation=args.elevation)[:2]
-        if args.camera_azimuth == -1000:
-            if args.facing_back == True:
-                args.camera_azimuth = default_azimuth
-                if args.camera_azimuth > 180.0:
-                    args.camera_azimuth -= 360.0
-            else:
-                args.camera_azimuth = default_azimuth - 180.0
-            print "default camera_azimuth is %f" % args.camera_azimuth
-        if args.camera_pitch == -1000:
-            if args.facing_back == True:
-                args.camera_pitch = default_zenith - 180.0
-            else:
-                args.camera_pitch = -default_zenith
-            print "default camera_pitch is %f" % args.camera_pitch
+        if args.facing_back == True:
+            args.camera_azimuth = default_azimuth
+            args.camera_pitch = default_zenith - 180.0
+            args.camera_roll = 0.0
+        else:
+            args.camera_azimuth = default_azimuth - 180.0
+            if args.camera_azimuth < 0.0:
+                args.camera_azimuth += 360.0
+            args.camera_pitch = -default_zenith
+            args.camera_roll = 0.0
+        print "default camera_azimuth is %f" % args.camera_azimuth
+        print "default camera_pitch is %f" % args.camera_pitch
+        print "default camera_roll is %f" % args.camera_roll
     xs, ys, colors = getPoints(args)
     plot(args, xs, ys, colors)
 

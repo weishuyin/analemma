@@ -1,6 +1,6 @@
 # Analemma
 
-![alt example12](https://raw.githubusercontent.com/weishuyin/analemma/master/img/example2.png "example2")
+![alt example2](https://raw.githubusercontent.com/weishuyin/analemma/master/img/example2.png "example2")
 
 In astronomy, an analemma is a diagram showing the position of the Sun in the sky, as seen from a fixed location on Earth at the same mean solar time, as that position varies over the course of a year[1]. 
 
@@ -58,8 +58,7 @@ In this code, date&time is in UTC format. Latitude is positive for the Northern 
  * roll: Rotation around Y axis (-90<=roll<=90), with positive values when
  *  the x-axis moves towards the z-axis.
 ```
-You can put your phone and camera together, camera screen's width align to phone's width, camera screen's height align to phone's height, so you can get camera's orientation. 
-In some app, orientation may be -180.0<=azimuth<=180.0, -90<=pitch<=90, -180<=roll<=180, it's ok.
+You can put your phone and camera together, camera screen's width align to phone's width, camera screen's height align to phone's height, so you can get camera's orientation.
 
 Sun position calculation is based on [s-bear/sun-position](https://github.com/s-bear/sun-position).
 
@@ -78,9 +77,9 @@ python analemma.py
 
 ## Example2
 ```
-python analemma.py --datetime '2019-12-4 7:0:0' --latitude 30.0 --longitude 120.0 --focal_length=16 --camera_azimuth -120 --camera_pitch -120
+python analemma.py --datetime '2019-12-4 7:0:0' --latitude 30.0 --longitude 120.0 --focal_length=16
 ```
-![alt example12](https://raw.githubusercontent.com/weishuyin/analemma/master/img/example2.png "example2")
+![alt example2](https://raw.githubusercontent.com/weishuyin/analemma/master/img/example2.png "example2")
 
 
 # References
