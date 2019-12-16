@@ -60,6 +60,8 @@ In this code, date&time is in UTC format. Latitude is positive for the Northern 
 ```
 You can put your phone and camera together, camera screen's width align to phone's width, camera screen's height align to phone's height, so you can get camera's orientation.
 
+In some app, orientation may be -180.0<=azimuth<=180.0, -90<=pitch<=90, -180<=roll<=180, it's ok.
+
 Sun position calculation is based on [s-bear/sun-position](https://github.com/s-bear/sun-position).
 
 # Install

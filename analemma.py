@@ -26,6 +26,8 @@ def getLatitudeLongitude():
     content = response.read()
     jsonContent = json.loads(content)
     latitude,longitude = jsonContent["loc"].split(",")
+    latitude = float(latitude)
+    longitude = float(longitude)
     print "latitude=%f longitude=%f" % (latitude, longitude)
     return latitude,longitude
 
@@ -62,7 +64,7 @@ def worldPoint2ViewPoint(worldPoint, cameraAzimuth, cameraPitch, cameraRoll):
     Rx = np.array([[1,0,0], [0, math.cos(cameraPitch/180.0*math.pi), -math.sin(cameraPitch/180.0*math.pi)], [0, math.sin(cameraPitch/180.0*math.pi), math.cos(cameraPitch/180.0*math.pi)]])
     Ry = np.array([[math.cos(cameraRoll/180.0*math.pi),0,math.sin(cameraRoll/180.0*math.pi)], [0,1,0], [-math.sin(cameraRoll/180.0*math.pi),0,math.cos(cameraRoll/180.0*math.pi)]])
     Rz = np.array([[math.cos(cameraAzimuth/180.0*math.pi), -math.sin(cameraAzimuth/180.0*math.pi), 0], [math.sin(cameraAzimuth/180.0*math.pi), math.cos(cameraAzimuth/180.0*math.pi), 0], [0,0,1]])
-    matrix = np.dot(Rx, np.dot(Ry, Rz))
+    matrix = np.dot(Ry, np.dot(Rx, Rz))
     viewPoint = np.dot(matrix, worldPoint)
     return viewPoint
 
