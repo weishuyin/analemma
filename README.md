@@ -58,7 +58,7 @@ In this code, date&time is in UTC format. Latitude is positive for the Northern 
  * roll: Rotation around Y axis (-90<=roll<=90), with positive values when
  *  the x-axis moves towards the z-axis.
 ```
-You can put your phone and camera together, camera screen's width align to phone's width, camera screen's height align to phone's height, so you can get camera's orientation.
+You can put your phone and DSLR together, DSLR screen's width align to phone's width, DSLR screen's height align to phone's height, so you can get DSLR's orientation.
 
 In some app, orientation may be -180.0<=azimuth<=180.0, -90<=pitch<=90, -180<=roll<=180, it's ok.
 
