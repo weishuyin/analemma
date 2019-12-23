@@ -115,8 +115,9 @@ def getPoints(args):
 
 def plot(args, xs, ys, colors):
     fig, ax = plt.subplots()
+    bbox = ax.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
     sun_diameter_in_mm = 1.392/149.6*args.focal_length
-    sun_diameter_in_dots = sun_diameter_in_mm/args.sensor_width*fig.get_size_inches()[0]*fig.get_dpi()
+    sun_diameter_in_dots = sun_diameter_in_mm/args.sensor_width*bbox.width*fig.get_dpi()
 
     ax.scatter(xs, ys, sun_diameter_in_dots*sun_diameter_in_dots, colors)
     ax.set_xbound(-args.sensor_width/2, args.sensor_width/2)
