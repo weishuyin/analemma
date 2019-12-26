@@ -124,6 +124,7 @@ def plot(args, xs, ys, colors):
     ax.set_ybound(-args.sensor_height/2, args.sensor_height/2)
     ax.set_xlabel('x/mm')
     ax.set_ylabel('y/mm')
+    ax.set_aspect('equal');
     if args.save:
         plt.savefig(args.save)
     else:
