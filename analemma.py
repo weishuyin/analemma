@@ -1,8 +1,9 @@
 #!/usr/bin/python
 
+# Simulate analemma photo based on GPS info, DSLR's orientation, DSLR's CMOS info
+
 from sunposition import sunpos
 from datetime import datetime,timedelta
-import pytz
 import urllib2
 import json
 import argparse
@@ -90,6 +91,11 @@ def viewPoint2Projection(viewPoint, focal_length, sensor_width, sensor_height, f
 
 # end of Coordinate System Transforms
 
+def mm2Pixel(args, point):
+    xInPixel = (point[0] + args.sensor_width/2.0)/args.sensor_width*args.pixel_width
+    yInPixel = (-point[1] + args.sensor_height/2.0)/args.sensor_height*args.pixel_height
+    return int(xInPixel),int(yInPixel)
+
 def getPoints(args):
     azimuth_list,zenith_list = getSolarPositions(args)
     xs = []
@@ -111,6 +117,8 @@ def getPoints(args):
             colors.append("#ffff00")
         xs.append(ret[0])
         ys.append(ret[1])
+        xInPixel,yInPixel = mm2Pixel(args, ret)
+        print "In image (x,y) = (%d,%d)" % (xInPixel,yInPixel)
     return xs,ys,colors
 
 def plot(args, xs, ys, colors):
@@ -140,6 +148,8 @@ def main():
     parser.add_argument("--focal_length", default=24, help="camera focal length in mm", type=float)
     parser.add_argument("--sensor_width", default=36, help="camera sensor width in mm", type=float)
     parser.add_argument("--sensor_height", default=24, help="camera sensor height in mm", type=float)
+    parser.add_argument("--pixel_width", default=5760, help="image width in pixel", type=int)
+    parser.add_argument("--pixel_height", default=3840, help="image height in pixel", type=int)
 
     parser.add_argument("--datetime", default=datetime.utcnow(), help="UTC datetime in format %%Y-%%m-%%d H:M:S", type=lambda s: datetime.strptime(s, '%Y-%m-%d %H:%M:%S'))
     parser.add_argument("--npoints_before", default=15, help="number of points before datetime", type=int)
@@ -157,16 +167,30 @@ def main():
     if args.camera_azimuth == -1000 or args.camera_pitch == -1000 or args.camera_roll == -1000:
         marchDateTime = args.datetime - timedelta(days = (args.datetime.month - 3)*30)
         default_azimuth, default_zenith = sunpos(marchDateTime, latitude=args.latitude, longitude=args.longitude, elevation=args.elevation)[:2]
-        if args.facing_back == True:
+        # if args.facing_back == True:
+        #     args.camera_azimuth = default_azimuth
+        #     args.camera_pitch = default_zenith - 180.0
+        #     args.camera_roll = 0.0
+        # else:
+        #     args.camera_azimuth = default_azimuth - 180.0
+        #     if args.camera_azimuth < 0.0:
+        #         args.camera_azimuth += 360.0
+        #     args.camera_pitch = -default_zenith
+        #     args.camera_roll = 0.0
+        if default_zenith <= 90.0:
+            args.camera_azimuth = default_azimuth - 180.0
+            if args.camera_azimuth < 0:
+                args.camera_azimuth += 360.0
+            args.camera_pitch = -default_zenith
+            args.camera_roll = 180.0
+        else:
             args.camera_azimuth = default_azimuth
             args.camera_pitch = default_zenith - 180.0
             args.camera_roll = 0.0
-        else:
-            args.camera_azimuth = default_azimuth - 180.0
-            if args.camera_azimuth < 0.0:
-                args.camera_azimuth += 360.0
-            args.camera_pitch = -default_zenith
-            args.camera_roll = 0.0
+        if args.facing_back == False:
+            args.camera_roll += 180.0
+            if args.camera_roll > 180.0:
+                args.camera_roll -= 360.0
         print "default camera_azimuth is %f" % args.camera_azimuth
         print "default camera_pitch is %f" % args.camera_pitch
         print "default camera_roll is %f" % args.camera_roll

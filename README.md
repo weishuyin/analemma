@@ -1,14 +1,22 @@
 # Analemma
-
-![alt example2](https://raw.githubusercontent.com/weishuyin/analemma/master/img/example2.png "example2")
-
-In astronomy, an analemma is a diagram showing the position of the Sun in the sky, as seen from a fixed location on Earth at the same mean solar time, as that position varies over the course of a year[1]. 
-
-This python code can show you how to take photos of analemma. How to place your DSLR, where and when to take shot.
-
-The green point means the location of the Sun based on the date&time you input. Sun runs from the red point to the blue point.
-
-In this code, date&time is in UTC format. Latitude is positive for the Northern Hemisphere, longitude is positive for the Eastern Hemisphere. Camera's orientation is same as android's orientation defined in /hardware/libhardware/include/hardware/sensors.h:
+  
+![alt example2](https://raw.githubusercontent.com/weishuyin/analemma/master/img/example2.png "example2")  
+  
+In astronomy, an analemma is a diagram showing the position of the Sun in the sky, as seen from a fixed location on Earth at the same mean solar time, as that position varies over the course of a year[1].  
+  
+This python project contains two programs:  
+1. analemma.py: Simulate analemma photo based on GPS info, DSLR's orientation, DSLR's CMOS info.  
+The green point means the location of the Sun based on the date&time you input. Sun runs from the red point to the blue point.  
+2. orientation.py: Calculate DLSR's orientation based on GPS info, position of Sun in photo and corresponding datetime.  
+  
+To get DSLR's orientation, there are two methods:  
+1. Use sensor app on phone.  
+	Put your phone and DSLR together, DSLR screen's width align to phone's width, DSLR screen's height align to phone's height. You can read orientation info from app.  
+	In some app, orientation may be -180.0<=azimuth<=180.0, -180<=pitch<=180, -90<=roll<=90, it's ok.  
+b. Use orientation.py.  
+	Put your DSLR on tripod and keep it not be moved. Take some photos of the Sun every 30min or other interval. Run orientation.py and input the position(in pixel) of the Sun in photo and the corresponding datetime. We can get DSLR's orientation.  
+  
+In this code, date&time is in UTC format. Latitude is positive for the Northern Hemisphere, longitude is positive for the Eastern Hemisphere. DSLR's orientation is like android's orientation defined in /hardware/libhardware/include/hardware/sensors.h, but the range of pitch is -90.0~90.0, the range of roll is -180.0~180.0:
 ```
 /**
  * Definition of the axis
@@ -52,18 +60,15 @@ In this code, date&time is in UTC format. Latitude is positive for the Northern 
  *  the Z axis (0<=azimuth<360).
  *      0=North, 90=East, 180=South, 270=West
  * 
- * pitch: Rotation around X axis (-180<=pitch<=180), with positive values when
+ * pitch: Rotation around X axis (-90<=pitch<=90), with positive values when
  *  the z-axis moves toward the y-axis.
  *
- * roll: Rotation around Y axis (-90<=roll<=90), with positive values when
+ * roll: Rotation around Y axis (-180<=roll<=180), with positive values when
  *  the x-axis moves towards the z-axis.
 ```
-You can put your phone and DSLR together, DSLR screen's width align to phone's width, DSLR screen's height align to phone's height, so you can get DSLR's orientation.
-
-In some app, orientation may be -180.0<=azimuth<=180.0, -90<=pitch<=90, -180<=roll<=180, it's ok.
-
-Sun position calculation is based on [s-bear/sun-position](https://github.com/s-bear/sun-position).
-
+  
+Sun position calculation is based on [s-bear/sun-position](https://github.com/s-bear/sun-position).  
+  
 # Install
 ```
 sudo pip install matplotlib pytz numpy
@@ -83,6 +88,10 @@ python analemma.py --datetime '2019-12-4 7:0:0' --latitude 30.0 --longitude 120.
 ```
 ![alt example2](https://raw.githubusercontent.com/weishuyin/analemma/master/img/example2.png "example2")
 
+## Example3
+```
+python orientation.py --latitude 30.29 --longitude 120.16 --data '[[4590,925,"2019-07-11 08:50:35"],[4440,1000,"2019-07-23 08:50:35"],[4255,1126,"2019-08-04 08:50:35"]]'
+```
 
 # References
 [1] Analemma <https://en.wikipedia.org/wiki/Analemma>
