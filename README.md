@@ -4,19 +4,21 @@
   
 In astronomy, an analemma is a diagram showing the position of the Sun in the sky, as seen from a fixed location on Earth at the same mean solar time, as that position varies over the course of a year[1].  
   
-This python project contains two programs:  
+This python project contains two programs:
 1. analemma.py: Simulate analemma photo based on GPS info, DSLR's orientation, DSLR's CMOS info.  
 The green point means the location of the Sun based on the date&time you input. Sun runs from the red point to the blue point.  
+
 2. orientation.py: Calculate DLSR's orientation based on GPS info, position of Sun in photo and corresponding datetime.  
   
-To get DSLR's orientation, there are two methods:  
+To get DSLR's orientation, there are two methods:
 1. Use sensor app on phone.  
 	Put your phone and DSLR together, DSLR screen's width align to phone's width, DSLR screen's height align to phone's height. You can read orientation info from app.  
 	In some app, orientation may be -180.0<=azimuth<=180.0, -180<=pitch<=180, -90<=roll<=90, it's ok.  
-b. Use orientation.py.  
+  
+2. Use orientation.py.  
 	Put your DSLR on tripod and keep it not be moved. Take some photos of the Sun every 30min or other interval. Run orientation.py and input the position(in pixel) of the Sun in photo and the corresponding datetime. We can get DSLR's orientation.  
   
-In this code, date&time is in UTC format. Latitude is positive for the Northern Hemisphere, longitude is positive for the Eastern Hemisphere. DSLR's orientation is like android's orientation defined in /hardware/libhardware/include/hardware/sensors.h, but the range of pitch is -90.0~90.0, the range of roll is -180.0~180.0:
+In this code, date&time is in UTC format. Latitude is positive for the Northern Hemisphere, longitude is positive for the Eastern Hemisphere. DSLR's orientation is like android's orientation defined in /hardware/libhardware/include/hardware/sensors.h, but the range of pitch is -90.0\~90.0, the range of roll is -180.0\~180.0:
 ```
 /**
  * Definition of the axis
