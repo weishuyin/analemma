@@ -86,13 +86,13 @@ python analemma.py
 
 ## Example2
 ```
-python analemma.py --datetime '2019-12-4 7:0:0' --latitude 30.0 --longitude 120.0 --focal_length=16
+python analemma.py --camera_azimuth 56 --camera_pitch -53 --camera_roll 180 --focal_length 16 --sensor_width 36 --sensor_height 24 --pixel_width 5760 --pixel_height 3840 --datetime '2019-12-4 7:0:0' --latitude 30.0 --longitude 120.0 --elevation 0
 ```
 ![alt example2](https://raw.githubusercontent.com/weishuyin/analemma/master/img/example2.png "example2")
 
 ## Example3
 ```
-python orientation.py --latitude 30.29 --longitude 120.16 --data '[[4590,925,"2019-07-11 08:50:35"],[4440,1000,"2019-07-23 08:50:35"],[4255,1126,"2019-08-04 08:50:35"]]'
+python orientation.py --latitude 30.29 --longitude 120.16 --elevation 0 --data '[[4590,925,"2019-07-11 08:50:35"],[4440,1000,"2019-07-23 08:50:35"],[4255,1126,"2019-08-04 08:50:35"]]' --focal_length 24 --sensor_width 36 --sensor_height 24 --pixel_width 5760 --pixel_height 3840
 ```
 
 # References
