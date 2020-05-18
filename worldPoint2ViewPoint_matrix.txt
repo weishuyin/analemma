@@ -1,0 +1,33 @@
+Rx = 
+1 		0   	0
+0		cosp 	-sinp
+0 		sinp    cosp
+
+Ry = 
+cosr 	0  		sinr
+0 		1 		0
+-sinr 	0 		cosr
+
+Rz = 
+cosa 	-sina 	0
+sina 	cosa 	0
+0 		0 		1
+
+Rx*Rz = 
+1 		0   	0			cosa 	-sina 	0
+0		cosp 	-sinp		sina 	cosa 	0
+0 		sinp    cosp		0 		0 		1
+= 
+cosa 		-sina 		0
+cosp*sina 	cosp*cosa 	-sinp
+sinp*sina 	sinp*cosa 	cosp
+
+
+Ry*Rx*Rz = 
+cosr 	0  		sinr		cosa 		-sina 		0
+0 		1 		0			cosp*sina 	cosp*cosa 	-sinp
+-sinr 	0 		cosr		sinp*sina 	sinp*cosa 	cosp
+=
+cosr*cosa+sinr*sinp*sina 	-cosr*sina+sinr*sinp*cosa 	sinr*cosp
+cosp*sina					cosp*cosa 					-sinp
+-sinr*cosa+cosr*sinp*sina 	sinr*sina+cosr*sinp*cosa 	cosr*cosp
